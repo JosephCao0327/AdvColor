@@ -1,6 +1,7 @@
 import sys
 import os
 
+
 def _scan_image_tree(dir_path, img_list):
     for i, name in enumerate(os.listdir(dir_path)):
         full_path = os.path.join(dir_path, name)
@@ -8,7 +9,7 @@ def _scan_image_tree(dir_path, img_list):
             _scan_image_tree(full_path, img_list)
         else:
             img = full_path
-            if(img.lower().endswith('.jpg') or img.lower().endswith('.png')
+            if (img.lower().endswith('.jpg') or img.lower().endswith('.png')
                     or img.lower().endswith('.gif')
                     or img.lower().endswith('.jpeg')
                     or img.lower().endswith('.jpeg2000')
@@ -18,9 +19,9 @@ def _scan_image_tree(dir_path, img_list):
                     or img.lower().endswith('.svg')
                     or img.lower().endswith('.bmp')):
                 img_list += [img]
-            if len(img_list)%100 == 0:
+            if len(img_list) % 100 == 0:
                 sys.stdout.flush()
-                sys.stdout.write('\r #img of scan: %d'%(len(img_list)))
+                sys.stdout.write('\r #img of scan: %d' % (len(img_list)))
 
 
 def scan_image_tree(dir_path):
@@ -45,5 +46,3 @@ def load_model(model):
     else:
         print('Error load ' + model)
         exit(0)
-
-

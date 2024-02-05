@@ -56,14 +56,15 @@ class TfFaceDetectorMtcnn(object):
         self.graph = tf.Graph()
         self.sess = tf.Session(graph=self.graph)
         with self.graph.as_default():
-            self.pnet, self.rnet, self.onet = detect_face.create_mtcnn(self.sess, None)
+            self.pnet, self.rnet, self.onet = detect_face.create_mtcnn(
+                self.sess, None)
 
     def mtcnn_detect(self, bgr_img, detect_scale=1.0):
         self.minsize = 20 / detect_scale
         detect_scale = 1.
         im = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
         im_scale = cv2.resize(im, (int(im.shape[1] * detect_scale),
-                                int(im.shape[0] * detect_scale)))
+                                   int(im.shape[0] * detect_scale)))
         bboxes, points = detect_face.detect_face(
             im_scale, self.minsize, self.pnet, self.rnet, self.onet,
             self.threshold, self.factor)
@@ -73,10 +74,10 @@ class TfFaceDetectorMtcnn(object):
             points = np.array([])
         else:
             bboxes /= detect_scale
-            w = bboxes[:,2] - bboxes[:,0]
-            h = bboxes[:,3] - bboxes[:,1]
-            bboxes[:,2] = w
-            bboxes[:,3] = h
+            w = bboxes[:, 2] - bboxes[:, 0]
+            h = bboxes[:, 3] - bboxes[:, 1]
+            bboxes[:, 2] = w
+            bboxes[:, 3] = h
             points = np.array(points) / detect_scale
 
             sort_index = np.argsort(-bboxes[:, 2])
@@ -85,7 +86,7 @@ class TfFaceDetectorMtcnn(object):
 
             points_out = []
             for point in points.T:
-                points_out += [np.array([[point[i], point[i+5]]
+                points_out += [np.array([[point[i], point[i + 5]]
                                          for i in range(5)])]
             points = np.array(points_out)
             # bboxes = bboxes.astype(int)
@@ -93,23 +94,23 @@ class TfFaceDetectorMtcnn(object):
         return bboxes, points
 
     def get_face_bboxes(self, im, detect_scale=1., verbose=0):
-        if type(im)==str:
+        if isinstance(im, str):
             im = cv2.imread(im, cv2.IMREAD_COLOR)
-        elif type(im)==np.ndarray:
+        elif isinstance(im, np.ndarray):
             pass
         else:
             print(im)
-            raise('error image input')
+            raise ('error image input')
 
         t1 = time()
         bboxes, shapes = self.mtcnn_detect(im, detect_scale=detect_scale)
         if self.joint_align:
-            if verbose>0:
-                print('detection %.2f ms'%((time()-t1)*1000.))
+            if verbose > 0:
+                print('detection %.2f ms' % ((time() - t1) * 1000.))
             return np.array(bboxes), np.array(shapes)
 
-        if verbose>0:
-            print('detection %.2f ms'%((time()-t1)*1000.))
+        if verbose > 0:
+            print('detection %.2f ms' % ((time() - t1) * 1000.))
 
         return np.array(bboxes)
 
@@ -159,7 +160,7 @@ def main():
             src_path += '/'
         img_list = scan_image_tree(src_path)
     else:
-        if(file_input.endswith('.jpg') or file_input.endswith('.png') or \
+        if (file_input.endswith('.jpg') or file_input.endswith('.png') or
                 file_input.endswith('.bmp')):
             img_list = [file_input]
         else:
@@ -169,9 +170,9 @@ def main():
     for img in img_list:
         img = cv2.imread(img, cv2.IMREAD_COLOR)
         print(img.shape)
-        ret = face_detector.get_face_bboxes(img, detect_scale=detect_scale, verbose=verbose)
+        ret = face_detector.get_face_bboxes(
+            img, detect_scale=detect_scale, verbose=verbose)
 
 
 if __name__ == '__main__':
     main()
-

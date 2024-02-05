@@ -51,7 +51,8 @@ class FaceNormalizer(object):
             img_size = np.asarray(img.shape)[0:2]
             imgs_aligned = []
             for point in list(points):
-                coord_point = np.array([[34.19, 46.16], [65.65, 45.98], [50.12, 82.40]], dtype=np.float32) # mxnet
+                coord_point = np.array([[34.19, 46.16], [65.65, 45.98], [
+                                       50.12, 82.40]], dtype=np.float32)  # mxnet
 
                 coord_point /= 100
                 if point.shape[0] == 5:
@@ -71,16 +72,19 @@ class FaceNormalizer(object):
                 estimate_type = 'skimage'
                 # estimate_type = 'cv2'
                 if estimate_type == 'cv2':
-                    H = cv2.getAffineTransform(cur_point, image_size * coord_point)
+                    H = cv2.getAffineTransform(
+                        cur_point, image_size * coord_point)
                 elif estimate_type == 'skimage':
                     tform = trans.SimilarityTransform()
                     tform.estimate(cur_point, image_size * coord_point)
-                    H = tform.params[0:2,:]
+                    H = tform.params[0:2, :]
                 else:
                     print('estimate_type error---->', estimate_type)
                     exit(0)
 
-                imgs_aligned.append(cv2.warpAffine(img, H, (image_size, image_size)))
+                imgs_aligned.append(
+                    cv2.warpAffine(
+                        img, H, (image_size, image_size)))
             return np.array(imgs_aligned)
         else:
             print('Unable to detect face')

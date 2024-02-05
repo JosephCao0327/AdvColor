@@ -12,28 +12,28 @@ class FASDataset(Dataset):
         transform: A function/transform that takes in a sample and returns a transformed version
         smoothing (bool): Use label smoothing
     """
+
     def __init__(self, test_list, depth_map_size, transform, smoothing):
         super().__init__()
         self.test_list = test_list
         with open(test_list, 'r') as f:
-            self.data = f.readlines()  
+            self.data = f.readlines()
         self.depth_map_size = depth_map_size
         self.transform = transform
-        
+
         if smoothing:
             self.label_weight = 1.0
         else:
             self.label_weight = 0.99
-
 
     def __getitem__(self, index):
         """ Get image, output map and label for a given index
         Args:
             index (int): index of image
         Returns:
-            img (PIL Image): 
+            img (PIL Image):
             mask: output map (32x32)
-            label: 1 (genuine), 0 (fake) 
+            label: 1 (genuine), 0 (fake)
         """
         img_name, label = self.data[index].strip('\n').split('\t')
 
@@ -43,17 +43,18 @@ class FASDataset(Dataset):
         label = np.expand_dims(label, axis=0)
 
         if label == 1:
-            depth_map = np.ones((self.depth_map_size[0], self.depth_map_size[1]), dtype=np.float32) * self.label_weight
+            depth_map = np.ones((self.depth_map_size[0], self.depth_map_size[1]), 
+                                dtype=np.float32) * self.label_weight
         else:
-            depth_map = np.ones((self.depth_map_size[0], self.depth_map_size[1]), dtype=np.float32) * (1.0 - self.label_weight)
+            depth_map = np.ones((self.depth_map_size[0], self.depth_map_size[1]), 
+                                dtype=np.float32) * (1.0 - self.label_weight)
 
         if self.transform:
             img_transform = self.transform(img)
-        
+
         img = np.array(transforms.Resize((128, 128))(img))
 
         return img_transform, depth_map, label, img_name, img
 
     def __len__(self):
         return len(self.data)
-    
